@@ -4,13 +4,10 @@ var file = 'test.txt';
 var Transform = require('stream').Transform;
 Transform.prototype._transform = function(chunk, encoding, cb) {
   id++;
-  console.log(id, ""+chunk);
-  this.push("Status: HTTP/1.1 200 OK");
-  this.push('Content-type: text/event-stream');
-  this.push('Cache-control: no-cache');
-  this.push('Connection: keep-alive');
   this.push("id:" + id + "\n");
-  this.push("data:" + chunk + "\n\n");
+  var data = "" + chunk;
+  data = data.replace(/(.*)\n/g, "$1<br/>");
+  this.push("data:"+ data + "\n\n");
   this.push("retry: 10");
   cb();
 };
@@ -23,14 +20,23 @@ fileWatcher.start = function(res) {
     if (curr.size !== prev.size) {
       var readStream = fs.createReadStream(file, {start: prev.size, end: curr.size});
       var tstream = new Transform();
-      readStream.pipe(tstream).pipe(res);
-      //var text = "";
-      //readStream.on('readable', function () { 
-      //  text += readStream.read();
-      //});
-      //readStream.on('end', function (close) {
-      //  fileWatcher.data = text;
-      //});
+      res.on('readable', function(){
+        console.log("" + res.read());
+      });
+      readStream.pipe(tstream);
+      var data = "";
+      tstream.on("readable", function() {
+        data += tstream.read();
+      });
+      tstream.on("end", function() {
+        res.writeHead(200, {
+          'Content-type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive'
+        });
+        res.write(data);
+        res.end();
+      });
     }
   });
 };
