@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Server Sent Events</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script>
+$(function() {
+  var source = new EventSource("/count");
+  console.log(source);
+  source.onmessage =  function(event) {
+    var chr = $("#chr");
+    console.log(event.data);
+    chr.text(event.data);
+    $("p").append("<br>" + event.data);
+  };
+});
+</script>
+</head>
+<body>
+<div>Sent data from the server: &quot;<span id="chr"></span>&quot;</div>
+
+<p></p>
+
+</body>
+</html>
