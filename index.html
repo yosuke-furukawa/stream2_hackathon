@@ -6,12 +6,14 @@
 <script>
 $(function() {
   var source = new EventSource("/count");
-  console.log(source);
   source.onmessage =  function(event) {
     var chr = $("#chr");
-    console.log(event.data);
     chr.text(event.data);
-    $("p").append("<br>" + event.data);
+    console.log(event.data);
+    $("p").append(event.data);
+    $('html, body').animate({
+      scrollTop: $(document).height()
+    }, 100);
   };
 });
 </script>
