@@ -7,9 +7,6 @@
 $(function() {
   var source = new EventSource("/count");
   source.onmessage =  function(event) {
-    var chr = $("#chr");
-    chr.text(event.data);
-    console.log(event.data);
     $("p").append(event.data);
     $('html, body').animate({
       scrollTop: $(document).height()
@@ -19,9 +16,6 @@ $(function() {
 </script>
 </head>
 <body>
-<div>Sent data from the server: &quot;<span id="chr"></span>&quot;</div>
-
 <p></p>
-
 </body>
 </html>
